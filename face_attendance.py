@@ -11,11 +11,13 @@ attend = sqlite3.connect('attendance.db')
 cur = attend.cursor()
 
 #For adding name and time to attendance
-def register(matches):
-	cur.execute("INSERT INTO Attended VALUES (?, ?, ?, ?)", matches)
+def register(matches, time):
+	
+	cur.execute("INSERT INTO Attended VALUES (?, ?)", (matches, time))
 	attend.commit()
 
 #For add face seperately if not staff. Good for seeing people who visit or number of people who visit
+##under development
 ##def match_error(no_match):
 	##cur.execute("INSERT INTO Error VALUES (?, ?)", no_match)
 
@@ -28,6 +30,8 @@ newton_face_encoding = face_recognition.face_encodings(newton_image)[0]
 
 nick_image = face_recognition.load_image_file("nick.jpg")
 nick_face_encoding = face_recognition.face_encodings(nick_image)[0]
+
+
 
 #creating arrays of faces and names
 known_face_encodings = [
@@ -71,7 +75,9 @@ while True:
 				first_match_index = matches.index(True)
 				name = known_face_names[first_match_index]
 				face_names.append(name)
-				register(name)
+				#Timestamping
+				time = datetime.datetime.now()
+				register(name, time)
             			
 	process_this_frame = not process_this_frame
 	
