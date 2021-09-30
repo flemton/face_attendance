@@ -3,12 +3,20 @@ import face_recognition
 import cv2
 import numpy as np
 import datetime
+import csv
+
+##with open('known_faces.csv', newline=") as f:
+	##reader = csv.reader(f)
+	##for row in reader:
+		##print(row))
 
 #Opening connection to database.
 attend = sqlite3.connect('attendance.db')
+error = sqlite3.connect('attendance.db')
 
 #Creating table to store attendees and time
 cur = attend.cursor()
+cur_e = error.cursor()
 
 #For adding name and time to attendance
 def register(matches, time):
@@ -17,9 +25,10 @@ def register(matches, time):
 	attend.commit()
 
 #For add face seperately if not staff. Good for seeing people who visit or number of people who visit
-##under development
-##def match_error(no_match):
-	##cur.execute("INSERT INTO Error VALUES (?, ?)", no_match)
+def match_error(no_match, time):
+
+	cur_e.execute("INSERT INTO Error VALUES (?, ?)", (no_match, time))
+	error.commit()
 
 #Getting access to webcam. 0 for main cam
 video_capture = cv2.VideoCapture(0)
@@ -38,9 +47,9 @@ known_face_encodings = [
 	newton_face_encoding,
 	nick_face_encoding
 ]
-known_face_names = [
+staff_id = [
 	"1",
-	"Nick"
+	"2"
 ]
 
 #initializing some variables
@@ -59,7 +68,6 @@ while True:
 	#Convert image from BGR color(OpenCV) to RGB color(face_recognition compatible)
 	rgb_small_frame = small_frame[:, :, ::-1]
 	
-	#
 	if process_this_frame:
 		#Find all faces and encodings in current video frame
 		face_locations = face_recognition.face_locations(rgb_small_frame)
@@ -70,15 +78,19 @@ while True:
 			#If there is a match for known faces
 			matches = face_recognition.compare_faces(known_face_encodings, face_encoding)
 			name = "Unknown"
-            		# # If a match was found in known_face_encodings, just use the first one.
+
+			#Timestamping
+			time = datetime.datetime.now()
+
+            #If a match was found in known_face_encodings, just use the first one.
 			if True in matches:
 				first_match_index = matches.index(True)
-				name = known_face_names[first_match_index]
+				name = staff_id[first_match_index]
 				face_names.append(name)
-				#Timestamping
-				time = datetime.datetime.now()
 				register(name, time)
-            			
+			else:
+				match_error(name, time)
+          			
 	process_this_frame = not process_this_frame
 	
 	# Display the results
@@ -110,4 +122,4 @@ cv2.destroyAllWindows()
 
 
 #Closing database connection
-##attend.close()
+attend.close()
