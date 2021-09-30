@@ -34,18 +34,18 @@ def match_error(no_match, time):
 video_capture = cv2.VideoCapture(0)
 
 #Loading sample pic and learning to recognize
-newton_image = face_recognition.load_image_file("newton.jpg")
-newton_face_encoding = face_recognition.face_encodings(newton_image)[0]
+first_face = face_recognition.load_image_file("img/1.jpg")
+first_face_encoding = face_recognition.face_encodings(first_face)[0]
 
-nick_image = face_recognition.load_image_file("nick.jpg")
-nick_face_encoding = face_recognition.face_encodings(nick_image)[0]
+second_face = face_recognition.load_image_file("img/2.jpg")
+second_face_encoding = face_recognition.face_encodings(second_face)[0]
 
 
 
 #creating arrays of faces and names
 known_face_encodings = [
-	newton_face_encoding,
-	nick_face_encoding
+	first_face_encoding,
+	second_face_encoding
 ]
 staff_id = [
 	"1",
