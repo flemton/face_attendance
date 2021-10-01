@@ -19,12 +19,11 @@
   * face_recognition (just install with pip install face_recognition ).
   * install OpenCV (just install with pip install opencv-python on terminal)
 
-## Usage
 #### Files and Folders: 
-##### /img: Folder to Save images of faces to recognize
-##### README.md: Contains all info and instructions for app
-##### attendance.db: This is where the Database is stored
-##### face_attendance.py: This is the app that does the matching and writing databases
+  * /img: Folder to Save images of faces to recognize
+  * README.md: Contains all info and instructions for app
+  * attendance.db: This is where the Database is stored
+  * face_attendance.py: This is the app that does the matching and writing databases
 ##### dependencies/libraries used:
    * OpenCV (cv2) for getting access to camera
    * face_recognition for identifying faces and running recognitions
