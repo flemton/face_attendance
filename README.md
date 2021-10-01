@@ -6,6 +6,7 @@
 ### Requirements
   * OpenCV
   * face_recognition
+  * Camera (webcam/ security cam)
 
 #### Mac or Linux
   * install [pip](https://pip.pypa.io/en/stable/installation/).
