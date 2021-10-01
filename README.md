@@ -43,7 +43,6 @@
    * Prof. David J. Malan
    * Brian Yu
    * Doug Llyod
-   * CS50
    * All CS50 team
    * Students of CS50
    * All Computer Scientists around the globe.
