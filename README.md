@@ -4,15 +4,20 @@
   * Linux, Mac or Windows(tricky)
 
 ### Requirements
+  * OpenCV
+  * face_recognition
 
-  * [face_recognition](https://github.com/ageitgey/face_recognition/blob/master/README.md#installation)
 #### Mac or Linux
- * install [face_recognition](https://github.com/ageitgey/face_recognition/blob/master/README.md#installing-on-mac-or-linux)
+  * install [pip](https://pip.pypa.io/en/stable/installation/).
+  * install [face_recognition](https://github.com/ageitgey/face_recognition/blob/master/README.md#installing-on-mac-or-linux)
+  * install OpenCV (just install with pip install opencv-python on terminal)
 
 #### Windows
-  * Microsoft Visual Studio 2015 (or newer) with C/C++ Compiler installed.
+  * Microsoft Visual Studio 2019 (or newer) with C/C++ Compiler installed.
+  * install [pip](https://pip.pypa.io/en/stable/installation/) if you haven't already.
   * [Cmake](https://cmake.org/download/)
   * face_recognition (just install with pip install face_recognition ).
+  * install OpenCV (just install with pip install opencv-python on terminal)
 
 ## Usage
   
