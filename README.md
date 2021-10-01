@@ -39,6 +39,7 @@
    * Attendance is stored in attendance.db in Attended table.
    * Continue your daily activities or grab a cup and coffee and sleep after that.
 ###### Thanks
+   * Nick
    * Prof. David J. Malan
    * Brian Yu
    * Doug Llyod
