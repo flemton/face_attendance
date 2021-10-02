@@ -7,33 +7,25 @@ import datetime
 #Opening connection to database.
 attend = sqlite3.connect('attendance.db')
 
-#Creating table to store attendees and time
+#Connecting to database
 cur = attend.cursor()
 
 #For adding name and time to attendance
-def register(name, staff_ids):
+def register(name):
 	
 	#Getting today's date
 	date = datetime.datetime.now()
 	day = date.strftime("%d")
 	month = date.strftime("%m")
 	year = date.strftime("%y")
+	time = datetime.datetime.now().strftime("%X")
 	#cur.execute("INSERT INTO dates(day, month, year) VALUES (?, ?, ?)", (day, month, year))
 	#attend.commit()
 	
 	#date_id = cur.execute("SELECT id FROM dates WHERE day=? AND month = ? AND year = ?", (day, month, year))
 	staff_id = 1
 
-	time = datetime.datetime.now().strftime("%X")
 	cur.execute("INSERT INTO Attended VALUES (?, ?, ?, ?, ?, ?)", (staff_id, name, time, day, month, year))
-	attend.commit()
-	#Closing database connection
-	attend.close()
-
-#For add face seperately if not staff. Good for seeing people who visit or number of people who visit
-def match_error(date_id, time):
-
-	cur.execute("INSERT INTO Error VALUES (?, ?)", (date_id, time))
 	attend.commit()
 
 #Getting access to webcam. 0 for main cam
@@ -45,15 +37,14 @@ staff_ids = []
 known_names = []
 
 #querying face_encodings and corresponding ids from database
-encs = cur.execute("SELECT img_name, id, name FROM staff")
+encs = cur.execute("SELECT img_name, name FROM Staff")
 for row in encs:
 	
 	#Loading sample pic and learning to recognize
 	face = face_recognition.load_image_file(row[0])
 	encoding = face_recognition.face_encodings(face)[0]
 	known_face_encodings.append(encoding)
-	staff_ids.append(row[1])
-	known_names.append(row[2])
+	known_names.append(row[1])
 
 
 
@@ -91,7 +82,7 @@ while True:
 				first_match_index = matches.index(True)
 				name = known_names[first_match_index]
 				face_names.append(name)
-				register(name, staff_ids)
+				register(name)
           			
 	process_this_frame = not process_this_frame
 	
@@ -117,6 +108,9 @@ while True:
 	# Hit 'q' on the keyboard to quit!
 	if cv2.waitKey(1) & 0xFF == ord('q'):
 		break
+
+#Closing database connection
+attend.close()
 
 # Release handle to the webcam
 video_capture.release()

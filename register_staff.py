@@ -8,9 +8,8 @@ cur = facedb.cursor()
 image_name = input("Enter image name and directory like 'img/1.jpg' : ")
 staff_id = int(input("Enter staff id number: "))
 name = input("Enter name of staff: ")
-encoded = input("Enter encoded name to give: ")
 
-cur.execute("INSERT INTO staff VALUES (?, ?, ?, ?)", (staff_id, name, image_name, encoded))
+cur.execute("INSERT INTO staff VALUES (?, ?, ?)", (staff_id, name, image_name))
 #Saving changes to database
 facedb.commit()
 
