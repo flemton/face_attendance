@@ -3,54 +3,59 @@ import face_recognition
 import cv2
 import numpy as np
 import datetime
-import csv
-
-##with open('known_faces.csv', newline=") as f:
-	##reader = csv.reader(f)
-	##for row in reader:
-		##print(row))
 
 #Opening connection to database.
 attend = sqlite3.connect('attendance.db')
-error = sqlite3.connect('attendance.db')
 
 #Creating table to store attendees and time
 cur = attend.cursor()
-cur_e = error.cursor()
 
 #For adding name and time to attendance
-def register(matches, time):
+def register(name, staff_ids):
 	
-	cur.execute("INSERT INTO Attended VALUES (?, ?)", (matches, time))
+	#Getting today's date
+	date = datetime.datetime.now()
+	day = date.strftime("%d")
+	month = date.strftime("%m")
+	year = date.strftime("%y")
+	#cur.execute("INSERT INTO dates(day, month, year) VALUES (?, ?, ?)", (day, month, year))
+	#attend.commit()
+	
+	#date_id = cur.execute("SELECT id FROM dates WHERE day=? AND month = ? AND year = ?", (day, month, year))
+	staff_id = 1
+
+	time = datetime.datetime.now().strftime("%X")
+	cur.execute("INSERT INTO Attended VALUES (?, ?, ?, ?, ?, ?)", (staff_id, name, time, day, month, year))
 	attend.commit()
+	#Closing database connection
+	attend.close()
 
 #For add face seperately if not staff. Good for seeing people who visit or number of people who visit
-def match_error(no_match, time):
+def match_error(date_id, time):
 
-	cur_e.execute("INSERT INTO Error VALUES (?, ?)", (no_match, time))
-	error.commit()
+	cur.execute("INSERT INTO Error VALUES (?, ?)", (date_id, time))
+	attend.commit()
 
 #Getting access to webcam. 0 for main cam
 video_capture = cv2.VideoCapture(0)
 
-#Loading sample pic and learning to recognize
-first_face = face_recognition.load_image_file("img/1.jpg")
-first_face_encoding = face_recognition.face_encodings(first_face)[0]
+#creating arrays of faces and names(staff id's or student id's)
+known_face_encodings = []
+staff_ids = []
+known_names = []
 
-second_face = face_recognition.load_image_file("img/2.jpg")
-second_face_encoding = face_recognition.face_encodings(second_face)[0]
+#querying face_encodings and corresponding ids from database
+encs = cur.execute("SELECT img_name, id, name FROM staff")
+for row in encs:
+	
+	#Loading sample pic and learning to recognize
+	face = face_recognition.load_image_file(row[0])
+	encoding = face_recognition.face_encodings(face)[0]
+	known_face_encodings.append(encoding)
+	staff_ids.append(row[1])
+	known_names.append(row[2])
 
 
-
-#creating arrays of faces and names
-known_face_encodings = [
-	first_face_encoding,
-	second_face_encoding
-]
-staff_id = [
-	"1",
-	"2"
-]
 
 #initializing some variables
 face_locations = []
@@ -67,7 +72,7 @@ while True:
 	
 	#Convert image from BGR color(OpenCV) to RGB color(face_recognition compatible)
 	rgb_small_frame = small_frame[:, :, ::-1]
-	
+
 	if process_this_frame:
 		#Find all faces and encodings in current video frame
 		face_locations = face_recognition.face_locations(rgb_small_frame)
@@ -80,16 +85,13 @@ while True:
 			name = "Unknown"
 
 			#Timestamping
-			time = datetime.datetime.now()
 
             #If a match was found in known_face_encodings, just use the first one.
 			if True in matches:
 				first_match_index = matches.index(True)
-				name = staff_id[first_match_index]
+				name = known_names[first_match_index]
 				face_names.append(name)
-				register(name, time)
-			else:
-				match_error(name, time)
+				register(name, staff_ids)
           			
 	process_this_frame = not process_this_frame
 	
@@ -119,7 +121,3 @@ while True:
 # Release handle to the webcam
 video_capture.release()
 cv2.destroyAllWindows()
-
-
-#Closing database connection
-attend.close()
