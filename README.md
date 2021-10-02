@@ -33,8 +33,8 @@
 ## Usage
    * Make sure all requirements are in place
    * Name image files with simple numbers(staff id/ student id) and save in /img folder
-   * Configure by running register_face.py with python (run python register_face.py on windows or python3 register_face.py or Mac/Linux) and follow the prompts
-   * After successfully registering all faces, make sure camera is connected
+   * Configure by running register_staff.py with python (run python register_staff.py on windows or python3 register_face.py or Mac/Linux) and follow the prompts
+   * After successfully registering all staffs, make sure camera is connected
    * Run face_attendance and it'll automatically start register after a known person gets in camera
    * Attendance is stored in attendance.db in Attended table.
    * Continue your daily activities or grab a cup and coffee and sleep after that.
