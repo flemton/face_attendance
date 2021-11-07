@@ -36,6 +36,7 @@
    * mysql connector for creating, connecting and manipulating databases
 ## Usage
    * Make sure all requirements are in place
+   * If first time using, create database with the mysql script (01 - Create Database.sql) 
    * Name image files with simple short names, note image file extensions and copy to 'img' folder
    * Configure by running register_staff.py with python (run `python register_staff.py` on windows or `python3 register_face.py` on Mac/Linux) and follow the prompts
    * After successfully registering all staffs, make sure camera is connected
