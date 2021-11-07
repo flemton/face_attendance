@@ -1,32 +1,37 @@
-import sqlite3
+import mysql.connector
 import face_recognition
 import cv2
 import numpy as np
-import datetime
+from datetime import date, datetime
 
 #Opening connection to database.
-attend = sqlite3.connect('attendance.db')
+attend = mysql.connector.connect(user='root', password='qwertyui', host='127.0.0.1', database='attendancedb')
 
 #Connecting to database
-cur = attend.cursor()
+cur = attend.cursor(buffered=True)
 
 #For adding name and time to attendance
 def register(name):
 	
-	#Getting today's date
-	date = datetime.datetime.now()
-	day = date.strftime("%d")
-	month = date.strftime("%m")
-	year = date.strftime("%y")
-	time = datetime.datetime.now().strftime("%X")
-	#cur.execute("INSERT INTO dates(day, month, year) VALUES (?, ?, ?)", (day, month, year))
-	#attend.commit()
-	
-	#date_id = cur.execute("SELECT id FROM dates WHERE day=? AND month = ? AND year = ?", (day, month, year))
-	staff_id = 1
+	#Getting today's time and date
+	time =  datetime.now().strftime("%H:%M:%S")
+	datenow = datetime.now().strftime("%Y/%m/%d")
 
-	cur.execute("INSERT INTO Attended VALUES (?, ?, ?, ?, ?, ?)", (staff_id, name, time, day, month, year))
-	attend.commit()
+	query = "SELECT id FROM staff WHERE name=%s"
+	where = (name,)
+	cur.execute(query, where)
+	staff_id = cur.fetchone()
+	staff_id = staff_id[0]
+
+	query = "SELECT staff_id FROM attended WHERE staff_id=%s and date=%s"
+	where = (staff_id, datenow)
+	cur.execute(query, where)
+	cstaff = cur.fetchone()
+
+	if cstaff == None:
+
+		cur.execute("INSERT INTO attended (staff_id, name, time, date) VALUES (%s, %s, %s, %s)", (staff_id, name, time, datenow))
+		attend.commit()
 
 #Getting access to webcam. 0 for main cam
 video_capture = cv2.VideoCapture(0)
@@ -37,7 +42,8 @@ staff_ids = []
 known_names = []
 
 #querying face_encodings and corresponding ids from database
-encs = cur.execute("SELECT img_name, name FROM Staff")
+cur.execute("SELECT img_name, name FROM Staff")
+encs = cur.fetchall()
 for row in encs:
 	
 	#Loading sample pic and learning to recognize

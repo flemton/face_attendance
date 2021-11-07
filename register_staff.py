@@ -1,17 +1,23 @@
-import sqlite3
+import mysql.connector
 
 #Opening connection to database.
-facedb = sqlite3.connect('attendance.db')
-cur = facedb.cursor()
+cnx = mysql.connector.connect(user='root', password='qwertyui', host='127.0.0.1', database='attendancedb')
+cursor = cnx.cursor()
 
 #taking image url and staff ID/ index number from user
-image_name = input("Enter image name and directory like 'img/1.jpg' : ")
-staff_id = int(input("Enter staff id number: "))
+image_name = "img/"+input("Enter image name and directory like '1.jpg' : ")
+#staff_id = int(input("Enter staff id number: "))
 name = input("Enter name of staff: ")
 
-cur.execute("INSERT INTO staff VALUES (?, ?, ?)", (staff_id, name, image_name))
+cursor.execute("INSERT INTO staff (name, img_name) VALUES (%s, %s)", (name, image_name))
 #Saving changes to database
-facedb.commit()
+cnx.commit()
 
-facedb.close()
+query = "SELECT id FROM staff WHERE name=%s"
+where = (name,)
+cursor.execute(query, where)
+r = cursor.fetchone()
+print("Id for registered person")
+print(r[0])
+cnx.close()
 print("Sucess!")
