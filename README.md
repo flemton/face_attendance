@@ -1,28 +1,18 @@
 # face_attendance
 
 ## Installation
-  * Linux, Mac or Windows(tricky)
+  * Linux, Mac or Windows
 
 ### Requirements
-  * OpenCV
-  * face_recognition
-  * Camera (webcam/ security cam)
-  * Mysql (Community edition)
-
-#### Mac or Linux
+  * install python 3
   * install [pip](https://pip.pypa.io/en/stable/installation/).
-  * install [face_recognition](https://github.com/ageitgey/face_recognition/blob/master/README.md#installing-on-mac-or-linux)
-  * install OpenCV (just install with `pip3 install opencv-python` on terminal)
-  * install mysql connector after installing mysql (command is `pip3 install mysql-connector-python`)
+  * install Mysql (Community edition)
+  * open terminal or cmd in project folder and run `pip3 install -r requirements.txt`
 
-#### Windows
-  * Microsoft Visual Studio 2019 (or newer) with C/C++ Compiler installed.
-  * install [pip](https://pip.pypa.io/en/stable/installation/) if you haven't already.
+#### Should work on Windows, Linux and Mac (Only Windows and Linux tested though)
+  * You might want to install the following before installing requirements.
   * [Cmake](https://cmake.org/download/)
-  * face_recognition (just install with `pip install face_recognition` ).
-  * install OpenCV (just install with `pip install opencv-python` on terminal)
-  * Download [MYSQL COMMUNITY](https://dev.mysql.com/downloads/file/?id=508161)
-  * install mysql connector for python (install with `pip install mysql-connector-python`)
+  * Optionally on windows, Microsoft Visual Studio 2019 (or newer) with C/C++ Compiler installed.
 
 #### Files and Folders: 
   * /img: Folder to Save images of faces to recognize
