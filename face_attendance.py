@@ -89,7 +89,7 @@ while True:
 				name = known_names[first_match_index]
 				face_names.append(name)
 				register(name)
-          			
+
 	process_this_frame = not process_this_frame
 	
 	# Display the results
