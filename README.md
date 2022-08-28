@@ -7,12 +7,13 @@
   * install python 3
   * install [pip](https://pip.pypa.io/en/stable/installation/).
   * install Mysql (Community edition)
+  * install Cmake (on windows just install Visual Studio 2019 or newer with desktop development with C++ option checked)
   * open terminal or cmd in project folder and run `pip3 install -r requirements.txt`
 
 #### Should work on Windows, Linux and Mac (Only Windows and Linux tested though)
   * You might want to install the following before installing requirements.
   * [Cmake](https://cmake.org/download/)
-  * Optionally on windows, Microsoft Visual Studio 2019 (or newer) with C/C++ Compiler installed.
+  * On windows, you must install Microsoft Visual Studio 2019 (or newer) with C/C++ Compiler installed (Check desktop development with c++ option).
 
 #### Files and Folders: 
   * /img: Folder to Save images of faces to recognize
