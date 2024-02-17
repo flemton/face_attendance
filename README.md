@@ -4,7 +4,7 @@
   * Linux, Mac or Windows
 
 ### Requirements
-  * install python 3
+  * install python 3.8.0 (very important)
   * install Mysql (Community edition)
   * install Cmake (`pip3 install cmake`)
   * open terminal or cmd in project folder and run `pip3 install -r requirements.txt`
