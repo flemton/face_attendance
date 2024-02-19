@@ -45,12 +45,18 @@ known_names = []
 cur.execute("SELECT img_name, name FROM Staff")
 encs = cur.fetchall()
 for row in encs:
-	
-	#Loading sample pic and learning to recognize
-	face = face_recognition.load_image_file(row[0])
-	encoding = face_recognition.face_encodings(face)[0]
-	known_face_encodings.append(encoding)
-	known_names.append(row[1])
+  try:
+    # Loading sample pic and learning to recognize
+    face = face_recognition.load_image_file(row[0])
+    print("Face loaded:", row[0])
+    encoding = face_recognition.face_encodings(face, num_jitters=500)
+    if len(encoding) > 0:
+      known_face_encodings.append(encoding[0])
+      known_names.append(row[1])
+    else:
+      print("No face detected in", row[0])
+  except Exception as e:
+    print("Error processing", row[0], ":", str(e))
 
 
 
@@ -89,6 +95,8 @@ while True:
 				name = known_names[first_match_index]
 				face_names.append(name)
 				register(name)
+			else:
+				name = "Unknown"
 
 	process_this_frame = not process_this_frame
 	
