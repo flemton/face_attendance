@@ -33,3 +33,11 @@
 
 - `opencv-python`
 - `mysql-connector-python`
+
+###### Thanks
+
+- Nick
+- Prof. David J. Malan
+- Brian Yu
+- Doug Llyod
+- All CS50 team, students
