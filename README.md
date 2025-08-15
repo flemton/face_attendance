@@ -1,46 +1,35 @@
-# face_attendance
+# Face Attendance
 
 ## Installation
-  * Linux, Mac or Windows
+
+- Works on Linux, Mac, or Windows.
 
 ### Requirements
-  * install python 3
-  * install [pip](https://pip.pypa.io/en/stable/installation/).
-  * install Mysql (Community edition)
-  * install Cmake (on windows just install Visual Studio 2019 or newer with desktop development with C++ option checked)
-  * open terminal or cmd in project folder and run `pip3 install -r requirements.txt`
 
-#### Should work on Windows, Linux and Mac (Only Windows and Linux tested though)
-  * You might want to install the following before installing requirements.
-  * [Cmake](https://cmake.org/download/)
-  * On windows, you must install Microsoft Visual Studio 2019 (or newer) with C/C++ Compiler installed (Check desktop development with c++ option).
+- Python 3.x
+- [pip](https://pip.pypa.io/en/stable/installation/)
+- MySQL Community Edition
+- Install dependencies: `pip install -r requirements.txt`
 
-#### Files and Folders: 
-  * /img: Folder to Save images of faces to recognize
-  * README.md: Contains all info and instructions for app
-  * attendancedb: This is where the Database is stored
-  * face_attendance.py: This is the app that does the matching and writing databases
-##### dependencies/libraries used:
-   * OpenCV (cv2) for getting access to camera
-   * face_recognition for identifying faces and running recognitions
-   * datetime for getting access to and date-stamping
-   * mysql connector for creating, connecting and manipulating databases
+### Files
+
+- `/img`: Store staff face images
+- `01 - Create Database.sql`: Database setup
+- `face_attendance.py`: Main attendance app
+- `register_staff.py`: Staff registration script
+- `README.md`: Instructions
+- `requirements.txt`: Dependencies
+
 ## Usage
-   * Make sure all requirements are in place
-   * If first time using, 
-   * 1. create database with the mysql script (01 - Create Database.sql)
-   * 2. Open face_attendance.py with a text editor (notepad or any) go to line 8, change user and password to your database user and password. 
-   * Name image files with simple short names, note image file extensions and copy to 'img' folder
-   * Configure by running register_staff.py with python (run `python register_staff.py` on windows or `python3 register_face.py` on Mac/Linux) and follow the prompts
-   * After successfully registering all staffs, make sure camera is connected
-   * Run face_attendance and it'll automatically start register after a known person gets in camera
-   * Attendance is stored in attended table.
-   * Continue your daily activities or grab a cup and coffee and sleep after that.
-###### Thanks
-   * Nick
-   * Prof. David J. Malan
-   * Brian Yu
-   * Doug Llyod
-   * All CS50 team
-   * Students of CS50
-   * All Computer Scientists around the globe.
+
+1. Create database using `01 - Create Database.sql`.
+2. Update `face_attendance.py` (line 6) with your MySQL credentials.
+3. Place staff images in the `img` folder.
+4. Register staff with `python register_staff.py`.
+5. Run `python face_attendance.py` to start attendance tracking.
+6. Press 'q' to quit.
+
+## Dependencies
+
+- `opencv-python`
+- `mysql-connector-python`
