@@ -14,9 +14,10 @@ cursor.execute("SELECT img_name, name FROM staff")
 for img_name, name in cursor.fetchall():
     img = cv2.imread(img_name)
     if img is not None:
-        rgb_img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        encoding = cv2.face.LBPHFaceRecognizer_create().train(rgb_img)
-        known_encodings.append(encoding)
+        gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        recognizer = cv2.face.LBPHFaceRecognizer_create()
+        recognizer.train([gray_img], np.array([0]))  # Simplified training for demo
+        known_encodings.append(recognizer)
         known_names.append(name)
 
 # Register attendance
@@ -43,8 +44,9 @@ while True:
     
     for (x, y, w, h) in faces:
         face_roi = gray[y:y+h, x:x+w]
-        for encoding, name in zip(known_encodings, known_names):
-            if cv2.face.LBPHFaceRecognizer_create().predict(face_roi) == 0:
+        for recognizer, name in zip(known_encodings, known_names):
+            label, confidence = recognizer.predict(face_roi)
+            if confidence < 50:  # Threshold for recognition
                 cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
                 cv2.putText(frame, name, (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
                 register(name)
