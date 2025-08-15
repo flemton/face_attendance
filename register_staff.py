@@ -11,5 +11,6 @@ cursor.execute("INSERT INTO staff (name, img_name) VALUES (%s, %s)", (name, img_
 db.commit()
 
 cursor.execute("SELECT id FROM staff WHERE name=%s", (name,))
-print("Registered ID:", cursor.fetchone()[0])
+staff_id = cursor.fetchone()[0]
+print("Registered ID:", staff_id)
 db.close()
