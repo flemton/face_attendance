@@ -1,3 +1,4 @@
-opencv-contrib-python>=4.9.0.80 
-mysql-connector-python==8.0.33 
+opencv-contrib-python>=4.9.0.80
+mysql-connector-python==8.0.33
 numpy>=2.0.0
+pillow>=10.0.0
