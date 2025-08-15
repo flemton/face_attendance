@@ -1,123 +1,62 @@
-import mysql.connector
-import face_recognition
 import cv2
 import numpy as np
-from datetime import date, datetime
+from datetime import datetime
+import mysql.connector
 
-#Opening connection to database.
-attend = mysql.connector.connect(user='root', password='qwertyui', host='127.0.0.1', database='attendancedb')
+# Database connection
+db = mysql.connector.connect(user='root', password='qwertyui', host='127.0.0.1', database='attendancedb')
+cursor = db.cursor(buffered=True)
 
-#Connecting to database
-cur = attend.cursor(buffered=True)
-
-#For adding name and time to attendance
-def register(name):
-	
-	#Getting today's time and date
-	time =  datetime.now().strftime("%H:%M:%S")
-	datenow = datetime.now().strftime("%Y/%m/%d")
-
-	query = "SELECT id FROM staff WHERE name=%s"
-	where = (name,)
-	cur.execute(query, where)
-	staff_id = cur.fetchone()
-	staff_id = staff_id[0]
-
-	query = "SELECT staff_id FROM attended WHERE staff_id=%s and date=%s"
-	where = (staff_id, datenow)
-	cur.execute(query, where)
-	cstaff = cur.fetchone()
-
-	if cstaff == None:
-
-		cur.execute("INSERT INTO attended (staff_id, name, time, date) VALUES (%s, %s, %s, %s)", (staff_id, name, time, datenow))
-		attend.commit()
-
-#Getting access to webcam. 0 for main cam
-video_capture = cv2.VideoCapture(0)
-
-#creating arrays of faces and names(staff id's or student id's)
-known_face_encodings = []
-staff_ids = []
+# Load known faces
+known_encodings = []
 known_names = []
+cursor.execute("SELECT img_name, name FROM staff")
+for img_name, name in cursor.fetchall():
+    img = cv2.imread(img_name)
+    if img is not None:
+        rgb_img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        encoding = cv2.face.LBPHFaceRecognizer_create().train(rgb_img)
+        known_encodings.append(encoding)
+        known_names.append(name)
 
-#querying face_encodings and corresponding ids from database
-cur.execute("SELECT img_name, name FROM Staff")
-encs = cur.fetchall()
-for row in encs:
-	
-	#Loading sample pic and learning to recognize
-	face = face_recognition.load_image_file(row[0])
-	encoding = face_recognition.face_encodings(face)[0]
-	known_face_encodings.append(encoding)
-	known_names.append(row[1])
+# Register attendance
+def register(name):
+    time = datetime.now().strftime("%H:%M:%S")
+    date_now = datetime.now().strftime("%Y-%m-%d")
+    cursor.execute("SELECT id FROM staff WHERE name=%s", (name,))
+    staff_id = cursor.fetchone()[0]
+    cursor.execute("SELECT 1 FROM attended WHERE staff_id=%s AND date=%s", (staff_id, date_now))
+    if not cursor.fetchone():
+        cursor.execute("INSERT INTO attended (staff_id, name, time, date) VALUES (%s, %s, %s, %s)", (staff_id, name, time, date_now))
+        db.commit()
 
-
-
-#initializing some variables
-face_locations = []
-face_encodings = []
-face_names = []
-process_this_frame = True
+# Initialize webcam
+cap = cv2.VideoCapture(0)
+face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 
 while True:
-	#Grab a frame from video
-	ret, frame = video_capture.read()
-	
-	#Resizing video frame to 1/4 for faster recognition processing
-	small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
-	
-	#Convert image from BGR color(OpenCV) to RGB color(face_recognition compatible)
-	rgb_small_frame = small_frame[:, :, ::-1]
+    ret, frame = cap.read()
+    if not ret:
+        break
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    faces = face_cascade.detectMultiScale(gray, 1.1, 4)
+    
+    for (x, y, w, h) in faces:
+        face_roi = gray[y:y+h, x:x+w]
+        for encoding, name in zip(known_encodings, known_names):
+            if cv2.face.LBPHFaceRecognizer_create().predict(face_roi) == 0:
+                cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
+                cv2.putText(frame, name, (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
+                register(name)
+                break
+        else:
+            cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 0, 255), 2)
+            cv2.putText(frame, "Unknown", (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 255), 2)
 
-	if process_this_frame:
-		#Find all faces and encodings in current video frame
-		face_locations = face_recognition.face_locations(rgb_small_frame)
-		face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
-		
-		face_names = []
-		for face_encoding in face_encodings:
-			#If there is a match for known faces
-			matches = face_recognition.compare_faces(known_face_encodings, face_encoding)
-			name = "Unknown"
+    cv2.imshow('Attendance', frame)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
 
-			#Timestamping
-
-            #If a match was found in known_face_encodings, just use the first one.
-			if True in matches:
-				first_match_index = matches.index(True)
-				name = known_names[first_match_index]
-				face_names.append(name)
-				register(name)
-
-	process_this_frame = not process_this_frame
-	
-	# Display the results
-	for (top, right, bottom, left), name in zip(face_locations, face_names):
-        	# Scale back up face locations since the frame we detected in was scaled to 1/4 size
-		top *= 4
-		right *= 4
-		bottom *= 4
-		left *= 4
-
-        	# Draw a box around the face
-		cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
-
-        	# Draw a label with a name below the face
-		cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
-		font = cv2.FONT_HERSHEY_DUPLEX
-		cv2.putText(frame, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
-
-	# Display the resulting image
-	cv2.imshow('Video', frame)
-
-	# Hit 'q' on the keyboard to quit!
-	if cv2.waitKey(1) & 0xFF == ord('q'):
-		break
-
-#Closing database connection
-attend.close()
-
-# Release handle to the webcam
-video_capture.release()
+cap.release()
 cv2.destroyAllWindows()
+db.close()
