@@ -1,23 +1,15 @@
+import cv2
 import mysql.connector
 
-#Opening connection to database.
-cnx = mysql.connector.connect(user='root', password='qwertyui', host='127.0.0.1', database='attendancedb')
-cursor = cnx.cursor()
+db = mysql.connector.connect(user='root', password='qwertyui', host='127.0.0.1', database='attendancedb')
+cursor = db.cursor()
 
-#taking image url and staff ID/ index number from user
-image_name = "img/"+input("Enter image name and directory like '1.jpg' : ")
-#staff_id = int(input("Enter staff id number: "))
-name = input("Enter name of staff: ")
+img_name = "img/" + input("Enter image name (e.g., 1.jpg): ")
+name = input("Enter staff name: ")
 
-cursor.execute("INSERT INTO staff (name, img_name) VALUES (%s, %s)", (name, image_name))
-#Saving changes to database
-cnx.commit()
+cursor.execute("INSERT INTO staff (name, img_name) VALUES (%s, %s)", (name, img_name))
+db.commit()
 
-query = "SELECT id FROM staff WHERE name=%s"
-where = (name,)
-cursor.execute(query, where)
-r = cursor.fetchone()
-print("Id for registered person")
-print(r[0])
-cnx.close()
-print("Sucess!")
+cursor.execute("SELECT id FROM staff WHERE name=%s", (name,))
+print("Registered ID:", cursor.fetchone()[0])
+db.close()
