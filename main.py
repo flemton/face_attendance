@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 from PIL import Image, ImageTk
-import cv2
+import face_recognition
 import numpy as np
 from datetime import datetime
 import mysql.connector
@@ -25,7 +25,7 @@ cap = None
 attendance_window = None
 video_label = None
 
-# Load encodings lazily with proper training
+# Load encodings lazily
 def load_encodings():
     global known_encodings, known_names, encodings_loaded
     if not encodings_loaded:
@@ -34,19 +34,15 @@ def load_encodings():
         if not staff_data:
             logging.warning("No staff data found in database.")
             return
-        for idx, (img_name, name) in enumerate(staff_data):
-            img = cv2.imread(img_name, cv2.IMREAD_GRAYSCALE)
-            if img is not None:
-                # Resize to a standard size for consistency
-                img = cv2.resize(img, (100, 100))
-                recognizer = cv2.face.LBPHFaceRecognizer_create()
-                # Train with a unique label for each person
-                recognizer.train([img], np.array([idx]))
-                known_encodings.append(recognizer)
+        for img_name, name in staff_data:
+            img = face_recognition.load_image_file(img_name)
+            encoding = face_recognition.face_encodings(img)
+            if encoding:
+                known_encodings.append(encoding[0])
                 known_names.append(name)
-                logging.info(f"Trained recognizer for {name} with label {idx}")
+                logging.info(f"Loaded encoding for {name}")
             else:
-                logging.error(f"Failed to load image: {img_name}")
+                logging.error(f"Failed to encode image: {img_name}")
         encodings_loaded = True
 
 # Register attendance
@@ -61,7 +57,7 @@ def register(name):
         db.commit()
         logging.info(f"Registered attendance for {name} at {time}")
 
-# Update video feed with enhanced recognition
+# Update video feed with face_recognition
 def update_video():
     global cap, video_label, attendance_window
     if cap is None or video_label is None or attendance_window is None:
@@ -72,36 +68,26 @@ def update_video():
         logging.error("Failed to capture video frame.")
         return
 
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    # Enhance contrast and brightness
-    gray = cv2.equalizeHist(gray)
-    gray = np.clip(gray + 20, 0, 255).astype(np.uint8)  # Slight brightness boost
+    rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    face_locations = face_recognition.face_locations(rgb_frame)
+    face_encodings = face_recognition.face_encodings(rgb_frame, face_locations)
 
-    faces = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml').detectMultiScale(gray, 1.1, 3, minSize=(30, 30))
-
-    if not encodings_loaded and len(faces) > 0:
+    if not encodings_loaded and face_locations:
         threading.Thread(target=load_encodings, daemon=True).start()
 
-    for (x, y, w, h) in faces:
-        face_roi = gray[y:y+h, x:x+w]
-        if encodings_loaded and face_roi.size > 0:
-            face_roi = cv2.resize(face_roi, (100, 100))  # Match training size
-            recognized = False
-            for idx, (recognizer, name) in enumerate(zip(known_encodings, known_names)):
-                label, confidence = recognizer.predict(face_roi)
-                logging.debug(f"Confidence for {name}: {confidence}")
-                if confidence < 80:  # Increased threshold for testing
-                    cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
-                    cv2.putText(frame, name, (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
-                    register(name)
-                    recognized = True
-                    break
-            if not recognized:
-                cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 0, 255), 2)
-                cv2.putText(frame, "Unknown", (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 255), 2)
-        else:
-            cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 0, 255), 2)
-            cv2.putText(frame, "Low Light", (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 255), 2)
+    for (top, right, bottom, left), face_encoding in zip(face_locations, face_encodings):
+        matches = face_recognition.compare_faces(known_encodings, face_encoding, tolerance=0.6)
+        name = "Unknown"
+        if True in matches:
+            match_index = matches.index(True)
+            name = known_names[match_index]
+            logging.debug(f"Match found for {name} with tolerance 0.6")
+            register(name)
+
+        # Draw rectangle and label
+        color = (0, 255, 0) if name != "Unknown" else (0, 0, 255)
+        cv2.rectangle(frame, (left, top), (right, bottom), color, 2)
+        cv2.putText(frame, name, (left, top-10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, color, 2)
 
     frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     img = Image.fromarray(frame_rgb)
@@ -153,7 +139,7 @@ def register_staff_gui():
             os.makedirs("img", exist_ok=True)
             shutil.copy(file_path, img_name)
             # Verify image load
-            test_img = cv2.imread(img_name, cv2.IMREAD_GRAYSCALE)
+            test_img = face_recognition.load_image_file(img_name)
             if test_img is None:
                 messagebox.showerror("Error", f"Failed to load image: {img_name}")
                 os.remove(img_name)
@@ -162,7 +148,6 @@ def register_staff_gui():
             db.commit()
             messagebox.showinfo("Success", "Staff registered! Restart attendance to retrain.")
             reg_window.destroy()
-            # Invalidate encodings to force reload
             global encodings_loaded
             encodings_loaded = False
 
