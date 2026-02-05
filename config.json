@@ -1,0 +1,20 @@
+{
+  "database": {
+    "user": "root",
+    "password": "your_password",
+    "host": "127.0.0.1",
+    "database": "attendancedb"
+  },
+  "recognition": {
+    "confidence_threshold": 50,
+    "scale_factor": 1.1,
+    "min_neighbors": 3,
+    "min_size": [30, 30]
+  },
+  "display": {
+    "width": 640,
+    "height": 480,
+    "font_scale": 0.9,
+    "thickness": 2
+  }
+}
