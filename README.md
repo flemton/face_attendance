@@ -1,43 +1,72 @@
 # Face Attendance
 
-## Installation
+**Flemton Tech · local app**
 
-- Works on Linux, Mac, or Windows.
+Face attendance on this computer for schools and offices.
 
-### Requirements
+A clerk can install, register people, run a morning session, and export CSV without using a terminal. Faces and records stay in the data folder you choose. There is no cloud account and no internet is required for attendance.
 
-- Python 3.x
-- [pip](https://pip.pypa.io/en/stable/installation/)
-- MySQL Community Edition
-- Install dependencies: `pip install -r requirements.txt`
+## What you get
 
-### Files
+- **Take attendance** — morning session, Start / Pause / Stop, one mark per person per day
+- **Staff** — capture a photo to `{data}/faces/`, name, optional ID, role, class/department
+- **Log** — filters, CSV export, print, path shown in the footer
+- **Settings** — organisation, camera + test, data folder, Strict / Simple / Loose, English, optional MySQL
 
-- `/img`: Store staff face images
-- `01 - Create Database.sql`: Database setup
-- `face_attendance.py`: Main attendance app
-- `register_staff.py`: Staff registration script
-- `README.md`: Instructions
-- `requirements.txt`: Dependencies
+Times on screen are **Africa/Accra**.
 
-## Usage
+This is not Tamale Dispatch. It does not include payroll, GES, liveness, multi-camera, or a mobile app.
 
-1. Create database using `01 - Create Database.sql`.
-2. Update `face_attendance.py` (line 6) with your MySQL credentials.
-3. Place staff images in the `img` folder.
-4. Register staff with `python register_staff.py`.
-5. Run `python face_attendance.py` to start attendance tracking.
-6. Press 'q' to quit.
+## Clerk install (Windows)
 
-## Dependencies
+Use the packed build from a Windows machine (see [docs/WINDOWS.md](docs/WINDOWS.md)):
 
-- `opencv-python`
-- `mysql-connector-python`
+1. Run `FaceAttendance-1.0.0-Setup.exe`, **or** unzip the portable `FaceAttendance` folder and start `FaceAttendance.exe`.
+2. On first launch choose a **data folder** (or Skip for now). Config is saved as `config.json` in that folder.
+3. Connect the camera, register the first person, then take attendance.
 
-###### Thanks
+Default database: **SQLite** at `{data folder}/face_attendance.db`. Photos: `{data folder}/faces/`.
 
-- Nick
-- Prof. David J. Malan
-- Brian Yu
-- Doug Llyod
-- All CS50 team, students
+## Run from source (developers)
+
+Needs Python 3.10+. On Windows, `face_recognition` / dlib also need **Visual C++ Build Tools** and **CMake** — that is documented honestly in [docs/WINDOWS.md](docs/WINDOWS.md). Do not expect `pip install` alone to work on a clean Windows PC.
+
+```bash
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+python -m face_attendance
+```
+
+On Linux / macOS, after installing CMake and a C++ compiler:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements-dev.txt   # app UI + tests, no dlib
+pip install -r requirements.txt       # full recognition stack
+python -m face_attendance
+```
+
+Optional flags: `--data-dir PATH`, `--screen staff|log|settings|attendance|welcome`.
+
+`register_staff.py` opens the Staff screen. `face_attendance.py` starts the app.
+
+## Settings → Advanced (MySQL)
+
+MySQL is optional. Default is SQLite on this PC.
+
+If you already have the old `attendancedb` (`staff` + `attended` tables), connect under Advanced and use **Import old attendancedb** once. Schema for a new MySQL database is in `sql/mysql_schema.sql`. Credentials are stored only in `{data folder}/config.json` on that computer — they are never shipped in this repository.
+
+## Tests
+
+```bash
+pip install -r requirements-dev.txt
+pytest
+```
+
+Recognition tests that need `face_recognition` are skipped when dlib is not installed.
+
+## Credits
+
+Built from the CS50-era Face Attendance work. Thanks Nick, Prof. David J. Malan, Brian Yu, Doug Lloyd, and the CS50 team.

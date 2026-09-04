@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "flemton-face-attendance"
+version = "1.0.0"
+description = "Face attendance on this computer for schools and offices."
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "Flemton Tech" }]
+
+[project.scripts]
+face-attendance = "face_attendance.app:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+addopts = "-q"
