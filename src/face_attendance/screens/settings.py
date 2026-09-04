@@ -102,6 +102,21 @@ class SettingsScreen(tk.Frame):
             anchor="w", pady=(4, 8)
         )
 
+        note = tk.Frame(body, bg="#E8EEF6")
+        note.pack(fill=tk.X, pady=(12, 0))
+        tk.Label(
+            note,
+            text="Note: MySQL is optional for advanced use; default database is SQLite on this PC.",
+            bg="#E8EEF6",
+            fg=NAVY,
+            font=F(9),
+            wraplength=640,
+            justify=tk.LEFT,
+            padx=12,
+            pady=10,
+            anchor="w",
+        ).pack(fill=tk.X)
+
         about = tk.Frame(body, bg=WHITE)
         about.pack(fill=tk.X, pady=(12, 0))
         tk.Label(about, text="About", bg=WHITE, fg=INK, font=F(12, "bold"), anchor="w").pack(fill=tk.X)
@@ -124,21 +139,6 @@ class SettingsScreen(tk.Frame):
         self.adv_toggle.pack(anchor="w", pady=(18, 8))
         self.adv = tk.Frame(body, bg=WHITE)
         self._build_advanced(self.adv)
-
-        note = tk.Frame(body, bg="#E8EEF6")
-        note.pack(fill=tk.X, pady=(12, 0))
-        tk.Label(
-            note,
-            text="Note: MySQL is optional for advanced use; default database is SQLite on this PC.",
-            bg="#E8EEF6",
-            fg=NAVY,
-            font=F(9),
-            wraplength=640,
-            justify=tk.LEFT,
-            padx=12,
-            pady=10,
-            anchor="w",
-        ).pack(fill=tk.X)
 
     def _build_advanced(self, host: tk.Frame) -> None:
         tk.Label(

@@ -14,18 +14,10 @@ class CameraInfo:
     label: str
 
 
-def list_cameras(limit: int = 6) -> list[CameraInfo]:
-    found: list[CameraInfo] = []
-    for index in range(limit):
-        cap = _open(index)
-        if cap is None:
-            continue
-        cap.release()
-        found.append(CameraInfo(index=index, label=f"Camera {index}"))
-    if not found:
-        # Still offer Camera 0 so Settings can show a selection.
-        found.append(CameraInfo(index=0, label="Camera 0"))
-    return found
+def list_cameras(limit: int = 3) -> list[CameraInfo]:
+    """Offer local camera indexes. Test camera actually opens the device."""
+    # Do not probe every index on load — missing devices make OpenCV stall.
+    return [CameraInfo(index=index, label=f"Camera {index}") for index in range(max(1, limit))]
 
 
 def open_camera(index: int) -> cv2.VideoCapture:
