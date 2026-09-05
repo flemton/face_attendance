@@ -1,0 +1,8 @@
+# Tests and lint. Does not compile dlib.
+pytest>=8.0
+flake8>=7.0
+pillow>=10.0.0
+numpy>=1.24.0,<3
+tzdata>=2024.1
+opencv-python>=4.8.1
+mysql-connector-python>=8.0.33

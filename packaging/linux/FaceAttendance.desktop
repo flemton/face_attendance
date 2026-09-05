@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Face Attendance
+Comment=Face attendance on this computer for schools and offices
+Exec=FaceAttendance
+Icon=face-attendance
+Terminal=false
+Categories=Office;Education;
+StartupNotify=true
