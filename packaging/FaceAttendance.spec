@@ -1,10 +1,17 @@
-# PyInstaller spec — run from repo root on a Windows build PC.
-# See docs/WINDOWS.md. onedir is more reliable than onefile for OpenCV + dlib.
+# PyInstaller spec — run from repo root on the OS you are packing.
+# onedir is more reliable than onefile for OpenCV + dlib.
+# Windows: docs/WINDOWS.md  Linux: docs/LINUX.md  macOS: docs/MACOS.md
 
+import sys
 from pathlib import Path
 
 from PyInstaller.building.build_main import COLLECT, EXE, PYZ, Analysis
 from PyInstaller.utils.hooks import collect_data_files, collect_submodules
+
+try:
+    from PyInstaller.building.osx import BUNDLE
+except ImportError:  # pragma: no cover - Windows / Linux PyInstaller
+    BUNDLE = None
 
 ROOT = Path(SPECPATH).resolve().parent
 SRC = ROOT / "src"
@@ -57,3 +64,23 @@ coll = COLLECT(
     upx=False,
     name="FaceAttendance",
 )
+
+if sys.platform == "darwin" and BUNDLE is not None:
+    app = BUNDLE(
+        coll,
+        name="Face Attendance.app",
+        icon=None,
+        bundle_identifier="tech.flemton.faceattendance",
+        info_plist={
+            "CFBundleName": "Face Attendance",
+            "CFBundleDisplayName": "Face Attendance",
+            "CFBundleShortVersionString": "1.0.0",
+            "CFBundleVersion": "1.0.0",
+            "NSHighResolutionCapable": True,
+            "NSCameraUsageDescription": (
+                "Face Attendance uses the camera on this computer to register "
+                "people and take attendance. Nothing is uploaded."
+            ),
+            "LSApplicationCategoryType": "public.app-category.business",
+        },
+    )

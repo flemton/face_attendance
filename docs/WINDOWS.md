@@ -62,7 +62,12 @@ Zip `dist/FaceAttendance` for a portable drop.
 
 ## What we do not do from Linux CI
 
-This repository’s Linux agents cannot emit a signed Windows exe. Do not merge a release tag for a build that was not produced on Windows with the steps above.
+This repository’s Linux agents cannot emit a signed Windows exe. The `.exe` is still built on a Windows PC with the steps above. Do not merge a release tag for a build that was not produced on that OS.
+
+## Other platforms
+
+- Linux portable tarball / optional AppImage: [LINUX.md](LINUX.md)
+- macOS `.app`: [MACOS.md](MACOS.md) (built on a Mac)
 
 ## Runtime notes for IT
 

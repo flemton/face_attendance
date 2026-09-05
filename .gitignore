@@ -21,3 +21,5 @@ faces/
 Thumbs.db
 *.npy
 packaging/windows/output/
+packaging/linux/output/
+packaging/macos/output/

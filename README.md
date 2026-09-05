@@ -17,15 +17,29 @@ Times on screen are **Africa/Accra**.
 
 This is not Tamale Dispatch. It does not include payroll, GES, liveness, multi-camera, or a mobile app.
 
-## Clerk install (Windows)
+## Clerk install
 
-Use the packed build from a Windows machine (see [docs/WINDOWS.md](docs/WINDOWS.md)):
+Use a packed build from the matching OS. Clerks do not need Python or a compiler.
 
-1. Run `FaceAttendance-1.0.0-Setup.exe`, **or** unzip the portable `FaceAttendance` folder and start `FaceAttendance.exe`.
-2. On first launch choose a **data folder** (or Skip for now). Config is saved as `config.json` in that folder.
-3. Connect the camera, register the first person, then take attendance.
+1. Windows: run `FaceAttendance-1.0.0-Setup.exe`, **or** unzip the portable folder and start `FaceAttendance.exe`.
+2. macOS: open `Face Attendance.app` (first time: right-click → Open).
+3. Linux: unzip the tarball and start `FaceAttendance` (or the optional AppImage).
+4. On first launch choose a **data folder** (or Skip for now). Config is saved as `config.json` in that folder.
+5. Connect the camera, register the first person, then take attendance.
 
 Default database: **SQLite** at `{data folder}/face_attendance.db`. Photos: `{data folder}/faces/`.
+
+## Build for Windows / macOS / Linux
+
+Packed builds are produced **on that OS**. The Windows `.exe` is still built on a Windows PC.
+
+| Platform | Clerk deliverable | Build script | Doc |
+| --- | --- | --- | --- |
+| Windows | Setup.exe or portable folder | `packaging/windows/build.ps1` | [docs/WINDOWS.md](docs/WINDOWS.md) |
+| macOS | `Face Attendance.app` | `packaging/macos/build.sh` | [docs/MACOS.md](docs/MACOS.md) |
+| Linux | Portable tarball (optional AppImage) | `packaging/linux/build.sh` | [docs/LINUX.md](docs/LINUX.md) |
+
+All three compile **dlib** (`face_recognition`). Build-machine prerequisites are documented honestly in those files (VC++ / CMake on Windows; Xcode CLT + Homebrew CMake on Mac; build-essential + CMake on Linux). Apple Silicon notes (arm64 vs Intel, no universal2 binary) are in the macOS doc.
 
 ## Run from source (developers)
 
